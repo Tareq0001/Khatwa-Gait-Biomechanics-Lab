@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>خَـطْـوَة | المختبر التفاعلي ثلاثي الأبعاد للميكانيكا الحيوية وتصحيح المشي</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700;800&family=Syne:wght@700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <link rel="stylesheet" href="./src/styles/main.css" />
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="brand-wrapper">
+      <div class="brand-logo-icon">
+        <i class="fa-solid fa-shoe-prints"></i>
+      </div>
+      <div class="brand-titles">
+        <h1 data-i18n="app_title">خَـطْـوَة | مختبر الميكانيكا الحيوية وتصحيح المشي 3D</h1>
+        <div class="author-tag">
+          <span data-i18n="lead_architect">المبتكر وكبير مهندسي النظم:</span>
+          <strong data-i18n="lead_architect_val">أ. طارق ابوعشي</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs">
+      <button class="nav-tab-btn active" data-tab="tab-3d">
+        <i class="fa-solid fa-cube"></i> <span data-i18n="tab_3d_lab">مختبر المشي 3D</span>
+      </button>
+      <button class="nav-tab-btn" data-tab="tab-pressure">
+        <i class="fa-solid fa-fingerprint"></i> <span data-i18n="tab_pressure">الضغط الأخمصي ومسار CoP</span>
+      </button>
+      <button class="nav-tab-btn" data-tab="tab-calc">
+        <i class="fa-solid fa-calculator"></i> <span data-i18n="tab_calculator">حاسبة الكينماتيكا والأثر</span>
+      </button>
+    </nav>
+
+    <!-- Header Actions -->
+    <div class="header-actions">
+      <!-- Audio Metronome Quick Button -->
+      <button class="icon-btn" id="metronomeQuickBtn" title="Metronome">
+        <i class="fa-solid fa-stopwatch-20"></i>
+      </button>
+      <!-- Footstep Audio Toggle -->
+      <button class="icon-btn" id="audioQuickBtn" title="Footstep Acoustics">
+        <i class="fa-solid fa-volume-high"></i>
+      </button>
+      <!-- Theme Switcher -->
+      <button class="icon-btn" id="themeToggleBtn" title="Toggle Theme">
+        <i class="fa-solid fa-circle-half-stroke"></i>
+      </button>
+      <!-- Language Switcher -->
+      <button class="icon-btn" id="langToggleBtn" title="Change Language">
+        <span style="font-weight: 700; font-size: 0.8rem;" id="langText">EN</span>
+      </button>
+      <!-- Report Modal Button -->
+      <button class="primary-btn" id="openReportBtn">
+        <i class="fa-solid fa-file-medical"></i> <span data-i18n="tab_report">التقرير الإكلينيكي</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-layout">
+    <!-- PANE 1: 3D Gait Simulator -->
+    <section class="tab-pane active" id="tab-3d">
+      <div class="lab-grid">
+        <!-- Viewport Card -->
+        <div class="viewport-card">
+          <div class="three-container" id="threeContainer"></div>
+
+          <!-- Top Floating Viewport HUD -->
+          <div class="viewport-hud-top">
+            <div class="camera-preset-bar">
+              <button class="cam-btn active" data-cam="orbit">
+                <i class="fa-solid fa-arrows-rotate"></i> <span data-i18n="cam_orbit">منظور حر</span>
+              </button>
+              <button class="cam-btn" data-cam="side">
+                <i class="fa-solid fa-arrows-left-right"></i> <span data-i18n="cam_side">جانبي</span>
+              </button>
+              <button class="cam-btn" data-cam="front">
+                <i class="fa-solid fa-arrows-up-down"></i> <span data-i18n="cam_front">أمامي</span>
+              </button>
+              <button class="cam-btn" data-cam="top">
+                <i class="fa-solid fa-crosshairs"></i> <span data-i18n="cam_top">علوي</span>
+              </button>
+              <button class="cam-btn" data-cam="foot">
+                <i class="fa-solid fa-magnifying-glass-plus"></i> <span data-i18n="cam_foot">تكبير القدمين</span>
+              </button>
+            </div>
+
+            <div class="hud-metric-pill" id="alignmentStatusPill">
+              <i class="fa-solid fa-shield-halved"></i>
+              <span id="alignmentStatusText" data-i18n="hud_aligned">محاذاة بيوميكانيكية معتمدة</span>
+            </div>
+          </div>
+
+          <!-- Bottom Floating Viewport HUD (Timeline & Playback) -->
+          <div class="viewport-hud-bottom">
+            <div class="timeline-header">
+              <div class="phase-badge">
+                <i class="fa-solid fa-play-circle" style="color: var(--cyan-primary);"></i>
+                <span id="currentPhaseName">1. ضربة الكعب (Initial Contact)</span>
+              </div>
+              <div class="phase-desc" id="currentPhaseDesc">
+                لحظة تلامس كعب القدم مع الأرض بزاوية عطف ظهري مثالية، امتصاص الصدمة الأولى.
+              </div>
+            </div>
+
+            <!-- 8 Phase Timeline Pills -->
+            <div class="phase-buttons-row">
+              <button class="phase-pill active" data-phase="0">1. ضربة الكعب</button>
+              <button class="phase-pill" data-phase="1">2. التحميل</button>
+              <button class="phase-pill" data-phase="2">3. الارتكاز</button>
+              <button class="phase-pill" data-phase="3">4. رفع الكعب</button>
+              <button class="phase-pill" data-phase="4">5. دفع الأصابع</button>
+              <button class="phase-pill" data-phase="5">6. بداية التأرجح</button>
+              <button class="phase-pill" data-phase="6">7. منتصف التأرجح</button>
+              <button class="phase-pill" data-phase="7">8. نهاية التأرجح</button>
+            </div>
+
+            <!-- Playback Scrubber & Speed Controls -->
+            <div class="playback-controls-row">
+              <button class="play-toggle-btn" id="playPauseBtn" title="Play/Pause">
+                <i class="fa-solid fa-pause"></i>
+              </button>
+              <input type="range" class="range-slider" id="gaitScrubber" min="0" max="1" step="0.001" value="0" />
+              <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--cyan-primary); font-weight: 700; width: 50px; text-align: center;" id="progressPctText">
+                0%
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar Controls Panel -->
+        <aside class="sidebar-panel">
+          <!-- Auto-Correct Posture Banner -->
+          <div class="auto-correct-banner">
+            <button class="auto-correct-btn" id="autoCorrectToggleBtn">
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
+              <span id="autoCorrectBtnText" data-i18n="auto_correct_btn">تفعيل التصحيح الحيوي الذكي</span>
+            </button>
+          </div>
+
+          <!-- Posture Fault Switcher -->
+          <div>
+            <div class="panel-section-title">
+              <i class="fa-solid fa-person-walking"></i> <span data-i18n="posture_mode_title">أنماط المشي والانحرافات</span>
+            </div>
+            <div class="posture-cards-list">
+              <div class="posture-card-item active" data-posture="optimal">
+                <div class="posture-card-header">
+                  <span class="posture-title" data-i18n="fault_optimal">المشي السليم والمتزن</span>
+                  <span class="posture-badge badge-optimal">OPTIMAL</span>
+                </div>
+                <div class="posture-card-desc" data-i18n="fault_optimal_desc">
+                  محاذاة حيادية للعمود الفقري، زاوية هبوط متزنة 15°، وتوزيع ممتص للصدمات.
+                </div>
+              </div>
+
+              <div class="posture-card-item" data-posture="text_neck">
+                <div class="posture-card-header">
+                  <span class="posture-title" data-i18n="fault_text_neck">انحناء الرقبة وتحدب الظهر</span>
+                  <span class="posture-badge badge-fault">FAULT</span>
+                </div>
+                <div class="posture-card-desc" data-i18n="fault_text_neck_desc">
+                  إزاحة الرأس للأمام بمقدار 35° تضاعف الحمل المحوري على الفقرات 4 أضعاف.
+                </div>
+              </div>
+
+              <div class="posture-card-item" data-posture="overpronation">
+                <div class="posture-card-header">
+                  <span class="posture-title" data-i18n="fault_overpronation">تفلطح وانحراف الكاحل</span>
+                  <span class="posture-badge badge-fault">FAULT</span>
+                </div>
+                <div class="posture-card-desc" data-i18n="fault_overpronation_desc">
+                  انهيار القوس الإنسي وميلان الكاحل للداخل مولداً عزوم التواء عنيفة على الركبة.
+                </div>
+              </div>
+
+              <div class="posture-card-item" data-posture="supination">
+                <div class="posture-card-header">
+                  <span class="posture-title" data-i18n="fault_supination">المشي على الحافة الخارجية</span>
+                  <span class="posture-badge badge-fault">FAULT</span>
+                </div>
+                <div class="posture-card-desc" data-i18n="fault_supination_desc">
+                  ارتكاز وحشي قاسي مع ضعف امتصاص الصدمات وارتفاع خطر التواء الكاحل.
+                </div>
+              </div>
+
+              <div class="posture-card-item" data-posture="heavy_heel">
+                <div class="posture-card-header">
+                  <span class="posture-title" data-i18n="fault_heavy_heel">ضربة الكعب العنيفة</span>
+                  <span class="posture-badge badge-fault">FAULT</span>
+                </div>
+                <div class="posture-card-desc" data-i18n="fault_heavy_heel_desc">
+                  انغلاق مفصل الركبة تماماً عند الهبوط ناقلاً صدمات عنيفة للعمود الفقري.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Speed Selection -->
+          <div>
+            <div class="panel-section-title">
+              <i class="fa-solid fa-gauge-high"></i> <span data-i18n="speed_label">سرعة المشي المقاسة</span>
+            </div>
+            <div class="speed-pills-row">
+              <button class="speed-pill-btn" data-speed="2.5" data-i18n="speed_stroll">هادئ 2.5</button>
+              <button class="speed-pill-btn active" data-speed="5.0" data-i18n="speed_brisk">نشط 5.0</button>
+              <button class="speed-pill-btn" data-speed="7.5" data-i18n="speed_power">سريع 7.5</button>
+            </div>
+          </div>
+
+          <!-- Live Telemetry Mini HUD -->
+          <div>
+            <div class="panel-section-title">
+              <i class="fa-solid fa-wave-square"></i> <span data-i18n="hud_joint_torque">المؤشرات البيوميكانيكية</span>
+            </div>
+            <div class="hud-metrics-grid">
+              <div class="hud-metric-box">
+                <div class="label" data-i18n="hud_joint_torque">عزم إجهاد الركبة</div>
+                <div class="val" id="telemetryKneeTorque">2.2 kN</div>
+              </div>
+              <div class="hud-metric-box">
+                <div class="label" data-i18n="hud_axial_shock">الحمل الصدمي</div>
+                <div class="val" id="telemetryAxialShock">1.0× BW</div>
+              </div>
+              <div class="hud-metric-box">
+                <div class="label" data-i18n="hud_cadence_live">معدل الخطو</div>
+                <div class="val" id="telemetryCadence">112 BPM</div>
+              </div>
+              <div class="hud-metric-box">
+                <div class="label" data-i18n="calc_result_health_score">كفاءة القوام</div>
+                <div class="val" style="color: var(--emerald-primary);" id="telemetryHealthScore">96%</div>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- PANE 2: Plantar Foot Pressure & CoP -->
+    <section class="tab-pane" id="tab-pressure">
+      <div class="pressure-tab-container">
+        <!-- Canvas Card -->
+        <div class="pressure-canvas-card">
+          <div class="pressure-card-header">
+            <h2 data-i18n="pressure_title">
+              <i class="fa-solid fa-fingerprint" style="color: var(--cyan-primary);"></i>
+              خريطة توزيع الضغط الأخمصي ومسار مركز الضغط (CoP)
+            </h2>
+            <p data-i18n="pressure_subtitle">
+              تحليل ديناميكي لحظي متزامن مع دوران القدم في كل مرحلة حركية بدقة قياس إكلينيكية
+            </p>
+          </div>
+
+          <div class="canvas-wrapper">
+            <canvas id="pressureCanvas"></canvas>
+          </div>
+
+          <!-- Gradient Color Scale -->
+          <div class="pressure-scale-bar">
+            <span data-i18n="pressure_scale_low">منخفض (0-150 kPa)</span>
+            <div class="scale-gradient"></div>
+            <span data-i18n="pressure_scale_high">إجهادي مرتفع (> 600 kPa)</span>
+          </div>
+        </div>
+
+        <!-- Pressure Sidebar Telemetry -->
+        <aside class="sidebar-panel">
+          <div class="panel-section-title">
+            <i class="fa-solid fa-chart-line"></i> <span data-i18n="pressure_subtitle">القياسات الأخمصية الفورية</span>
+          </div>
+
+          <div class="hud-metric-box" style="margin-bottom: 12px;">
+            <div class="label" data-i18n="peak_pressure">الضغط الأخمصي الأقصى</div>
+            <div class="val" style="font-size: 1.6rem; color: var(--rose-alert);" id="pressValPeak">480 kPa</div>
+          </div>
+
+          <div class="hud-metric-box" style="margin-bottom: 12px;">
+            <div class="label" data-i18n="contact_area">مساحة التلامس الفعالة</div>
+            <div class="val" id="pressValArea">132 cm²</div>
+          </div>
+
+          <div class="hud-metric-box" style="margin-bottom: 12px;">
+            <div class="label" data-i18n="symmetry_ratio">مؤشر التناظر الحركي (يمين / يسار)</div>
+            <div class="val" style="color: var(--emerald-primary);" id="pressValSymmetry">50% / 50%</div>
+          </div>
+
+          <div class="hud-metric-box" style="margin-bottom: 12px;">
+            <div class="label">قوة رد الفعل الأرضي (GRF)</div>
+            <div class="val" style="color: var(--cyan-primary);" id="pressValGRF">115% BW</div>
+          </div>
+
+          <!-- CoP Butterfly explanation card -->
+          <div style="background: var(--bg-surface-elevated); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 14px; margin-top: 10px;">
+            <h4 style="font-size: 0.88rem; color: var(--cyan-primary); margin-bottom: 6px;" data-i18n="cop_curve_label">
+              مسار مركز الضغط الفراشة (CoP Butterfly Line)
+            </h4>
+            <p style="font-size: 0.77rem; color: var(--text-muted); line-height: 1.45;" data-i18n="cop_curve_desc">
+              خط أزرق نيوني متدرج يوضح خط انتقال مركز ثقل القوى من منتصف الكعب الخارجي إلى إبهام القدم.
+            </p>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- PANE 3: Precision Biomechanics & Impact Calculator -->
+    <section class="tab-pane" id="tab-calc">
+      <div class="calc-container">
+        <!-- Inputs Card -->
+        <div class="calc-inputs-card">
+          <div class="panel-section-title">
+            <i class="fa-solid fa-sliders"></i> <span data-i18n="calc_title">البيانات البيومترية والميدانية</span>
+          </div>
+
+          <div class="input-group">
+            <div class="input-label-row">
+              <span data-i18n="input_height">الطول (سم)</span>
+              <span class="input-val-badge" id="valHeight">175 cm</span>
+            </div>
+            <input type="range" class="range-slider" id="calcHeight" min="140" max="210" value="175" />
+          </div>
+
+          <div class="input-group">
+            <div class="input-label-row">
+              <span data-i18n="input_weight">الوزن (كجم)</span>
+              <span class="input-val-badge" id="valWeight">75 kg</span>
+            </div>
+            <input type="range" class="range-slider" id="calcWeight" min="40" max="140" value="75" />
+          </div>
+
+          <div class="input-group">
+            <div class="input-label-row">
+              <span data-i18n="input_cadence">معدل الخطو (خطوة/دقيقة)</span>
+              <span class="input-val-badge" id="valCadence">112 BPM</span>
+            </div>
+            <input type="range" class="range-slider" id="calcCadence" min="70" max="160" value="112" />
+          </div>
+
+          <div class="input-group">
+            <div class="input-label-row">
+              <span data-i18n="input_distance">المسافة المقطوعة (كم)</span>
+              <span class="input-val-badge" id="valDistance">5.0 km</span>
+            </div>
+            <input type="range" class="range-slider" id="calcDistance" min="1" max="25" step="0.5" value="5.0" />
+          </div>
+
+          <div style="margin-top: 24px;">
+            <button class="primary-btn" style="width: 100%; justify-content: center;" id="calcToReportBtn">
+              <i class="fa-solid fa-file-medical"></i> <span data-i18n="generate_report_btn">إصدار التقرير البيوميكانيكي</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Results Card -->
+        <div class="calc-results-card">
+          <!-- Score Hero -->
+          <div class="results-hero-score">
+            <div class="score-circle">
+              <span class="num" id="heroScoreNum">96</span>
+              <span class="out-of">/ 100</span>
+            </div>
+            <div class="score-details">
+              <h3 data-i18n="calc_result_health_score">مؤشر الكفاءة البيوميكانيكية وحماية المفاصل</h3>
+              <p id="heroScoreGrade" data-i18n="calc_grade_optimal">ممتاز - مشي بيوميكانيكي عالي الحماية للمفاصل</p>
+            </div>
+          </div>
+
+          <!-- Metrics Grid -->
+          <div class="results-metrics-grid">
+            <div class="metric-card">
+              <div class="m-title" data-i18n="calc_result_stride_opt">طول الخطوة البيوميكانيكي المثالي</div>
+              <div class="m-value" id="resOptimalStride">72.6 cm</div>
+              <div class="m-sub">معيار Winter Biomechanics (الطول × 0.415)</div>
+            </div>
+
+            <div class="metric-card">
+              <div class="m-title" data-i18n="calc_result_stride_act">الخطوة الفعلية الحالية</div>
+              <div class="m-value" id="resActualStride">72.6 cm</div>
+              <div class="m-sub" id="resStrideRatio">مطابقة تامة 100% للمعيار الطبيعي</div>
+            </div>
+
+            <div class="metric-card">
+              <div class="m-title" data-i18n="calc_result_knee_force">حمل صدمة مفصل الركبة</div>
+              <div class="m-value" style="color: var(--rose-alert);" id="resKneeForce">1.62 kN</div>
+              <div class="m-sub" id="resKneeReductionSub">تخفيض إجهاد بنسبة 35% بالمحاذاة السليمة</div>
+            </div>
+
+            <div class="metric-card">
+              <div class="m-title" data-i18n="calc_result_spinal_cushion">كفاءة التخميد للعمود الفقري</div>
+              <div class="m-value" style="color: var(--emerald-primary);" id="resSpinalCushion">92%</div>
+              <div class="m-sub">حماية الفقرات القطنية والعنقية من الاهتزاز</div>
+            </div>
+
+            <div class="metric-card">
+              <div class="m-title" data-i18n="calc_result_calories">السعرات الحرارية المحروقة</div>
+              <div class="m-value" style="color: var(--amber-warn);" id="resCalories">285 kcal</div>
+              <div class="m-sub" id="resDurationSub">في مدة تقديرية 60 دقيقة</div>
+            </div>
+
+            <div class="metric-card">
+              <div class="m-title">السرعة الحركية المقدرة</div>
+              <div class="m-value" style="color: var(--cyan-primary);" id="resSpeed">4.9 km/h</div>
+              <div class="m-sub">متطابقة مع وتيرة المشي النشط</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal: Certified Clinical Biomechanical Dossier -->
+  <div class="modal-backdrop" id="reportModal">
+    <div class="dossier-paper">
+      <!-- Dossier Header -->
+      <div class="dossier-header">
+        <div>
+          <div class="doc-title" data-i18n="report_title">ملف التقييم الإكلينيكي للمشية والبرنامج التصحيحي</div>
+          <div class="doc-sub" data-i18n="report_subtitle">تقرير رسمي معتمد يتضمن المؤشرات الحركية، ومخطط عيوب القوام، والتمارين العلاجية الموصى بها</div>
+        </div>
+        <div style="font-size: 2rem; color: #0f766e;">
+          <i class="fa-solid fa-certificate"></i>
+        </div>
+      </div>
+
+      <!-- Dossier Meta Grid -->
+      <div class="dossier-meta-grid">
+        <div class="dossier-meta-item">
+          <div class="lbl" data-i18n="rep_serial_num">الرقم التسلسلي البيومتري</div>
+          <div class="val" id="repSerialCode">KHATWA-2026-X8192</div>
+        </div>
+        <div class="dossier-meta-item">
+          <div class="lbl" data-i18n="rep_client_name">اسم المفحوص / المتدرب</div>
+          <div class="val" data-i18n="rep_client_default">رياضي / مستخدم المنصة</div>
+        </div>
+        <div class="dossier-meta-item">
+          <div class="lbl" data-i18n="rep_eval_date">تاريخ الفحص والتحليل</div>
+          <div class="val" id="repDateText">30 أكتوبر 2026</div>
+        </div>
+        <div class="dossier-meta-item">
+          <div class="lbl" data-i18n="rep_status_label">المؤشر العام</div>
+          <div class="val" style="color: #0f766e;" id="repScoreStatus">96 / 100 (ممتاز)</div>
+        </div>
+      </div>
+
+      <!-- Diagnosis Section -->
+      <div class="dossier-section">
+        <div class="dossier-sec-title" data-i18n="rep_biomech_summary">التشخيص الكينماتيكي وقراءة المتجهات</div>
+        <p style="font-size: 0.88rem; color: #334155; line-height: 1.6;" id="repDiagnosisParagraph">
+          بناءً على المحاكاة ثلاثية الأبعاد وتحليل توزيع الضغط الأخمصي، أظهرت الدورة الحركية توافقاً عالياً مع نمط المشي الأوبتيمال. تمت ملاحظة توزيع انسيابي لخط مركز الضغط من الحافة الوحشية للكعب وصولاً إلى دفع الإبهام مع كفاءة امتصاص صدمات للركبة بنسبة 92%.
+        </p>
+      </div>
+
+      <!-- Prescribed Drills Section -->
+      <div class="dossier-section">
+        <div class="dossier-sec-title" data-i18n="rep_prescribed_drills">البروتوكول الرياضي التأهيلي الموصى به</div>
+        <div class="drills-grid">
+          <div class="drill-box">
+            <h4 data-i18n="drill_1_title">1. تمرين استطالة الساق والعطف الظهري</h4>
+            <p data-i18n="drill_1_desc">3 مجموعات × 12 تكراراً لكل قدم لزيادة مرونة مفصل الكاحل ومنع ضربة الكعب القاسية وتفلطح القوس.</p>
+          </div>
+          <div class="drill-box">
+            <h4 data-i18n="drill_2_title">2. جسر تفعيل العضلة الألوية الوسطى</h4>
+            <p data-i18n="drill_2_desc">3 مجموعات × 15 تكراراً لمنع ميلان الحوض والتواء الركبتين للداخل وحماية أربطة الرباط الصليبي.</p>
+          </div>
+          <div class="drill-box">
+            <h4 data-i18n="drill_3_title">3. تمرين ملاك الحائط وتصحيح الصدر</h4>
+            <p data-i18n="drill_3_desc">دقيقتان يومياً لاستعادة تقوس الفقرات الصدرية الطبيعي وإرجاع الرأس لمحاذاة مركز ثقل الجسم.</p>
+          </div>
+          <div class="drill-box">
+            <h4 data-i18n="drill_4_title">4. تمرين الثبات الحسي على قدم واحدة</h4>
+            <p data-i18n="drill_4_desc">60 ثانية لكل قدم لإعادة تدريب المستقبلات العصبية وضمان انتقال خط مركز الضغط بسلاسة.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Signature & Barcode Footer -->
+      <div class="dossier-footer">
+        <div class="signature-block">
+          <div class="sig-title" data-i18n="rep_auth_signature">المبتكر ومصمم النظام البيوميكانيكي:</div>
+          <div class="sig-name" data-i18n="lead_architect_val">أ. طارق ابوعشي</div>
+          <div class="sig-role" data-i18n="rep_auth_title">أ. طارق ابوعشي — Lead Systems Architect & Biomechanical Computing Lead</div>
+        </div>
+        <div class="barcode-block">
+          <div style="font-size: 0.75rem; color: #64748b; margin-bottom: 4px;" data-i18n="rep_barcode_label">رمز التشفير الرقمي المعتمد</div>
+          <div class="barcode-font">||| | |||| | ||| |||| |</div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="dossier-actions-bar">
+        <button class="close-btn" id="closeReportBtn" data-i18n="close_modal">إغلاق التقرير</button>
+        <button class="primary-btn" id="printReportBtn">
+          <i class="fa-solid fa-print"></i> <span data-i18n="print_report_btn">طباعة التقرير الطبي المعتمد (PDF)</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./src/main.ts"></script>
+</body>
+</html>
